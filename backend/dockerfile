@@ -1,0 +1,49 @@
+FROM golang:1.23-alpine AS builder
+
+WORKDIR /app
+
+COPY go.mod go.sum ./
+RUN go mod download
+
+COPY . .
+RUN CGO_ENABLED=0 GOOS=linux go build -o main ./cmd/server
+
+
+# Stage pour les migrations
+FROM alpine:latest AS migrate
+
+WORKDIR /app
+
+# Copier le script de migration
+COPY migrate.sh ./migrate.sh
+RUN chmod +x ./migrate.sh
+
+# Si tu utilises un outil comme golang-migrate
+RUN apk add --no-cache bash postgresql-client
+
+CMD ["./migrate.sh"]
+
+
+FROM builder AS test
+
+WORKDIR /app
+
+ARG DATABASE_URL
+ARG PORT
+ENV DATABASE_URL=${DATABASE_URL} \
+    PORT=${PORT}
+
+CMD ["go", "test", "./..."]
+
+
+FROM alpine:latest AS prod
+
+RUN addgroup -g 1001 appuser && \
+    adduser -u 1001 -G appuser -D appuser
+
+WORKDIR /app
+
+COPY --from=builder --chown=appuser:appuser /app/main ./main
+USER appuser
+
+CMD ["./main"]

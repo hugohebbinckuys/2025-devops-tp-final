@@ -27,11 +27,11 @@ So this `dev/` branch directory 'll represent our dev environment.
 ### Prod environment 
 Every PR with the `main` branch 'll trigger the same CI as the dev CI (so install, tests, builds...). 
 Once the merge is ok on branch main, someone in the team 'll "validate" the main branch andd 'll decide to put put in prod the main branch, he will create a tag, and push this tag. 
-The tag push 'll trigger the prod CI/CD with install, tests, builds, github release, deployment of the app's diferent parts on their host platform (backend -> Render, db -> Neon etc.), deploy also the storybook, the images 'll be pushed on dockerhub... 
+The tag push 'll trigger the prod CI/CD with install, tests, builds, github release, deployment of the app's diferent parts on their host platform (backend -> Render, front -> Netlify etc.), deploy also the storybook, update of the db, docker images 'll be pushed on dockerhub... 
 
 
 # Reverse-proxy  
-We 'll have 3 diferent proxys. 
+We 'll use 3 reverse-proxies linked to each context. 
 
 ## Prod proxy 
 For our prod app, as we host our frontend on netlify, it'll be netlify that 'll play the proxy role. 
@@ -42,4 +42,4 @@ This one 'll be for our dev server in local.
 As we use Vite with react, we'll add a proxy-conf part in the vite.config.ts file to put in place this proxy on dev. 
 
 # Docker compose proxy 
-This one 'll be useful for organize trafic between our containers. As Docker isolate the services, they are'nt available outside so we need something to route requests into the good container without expose every port manually. 
+This one 'll be useful for organize trafic between our containers. As Docker isolate the services, they are'nt available outside the docker network so we need something to route requests into the good container without expose every port manually. 

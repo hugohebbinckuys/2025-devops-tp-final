@@ -1,0 +1,69 @@
+
+services:
+
+  db:
+    image: postgres:16
+    container_name: app-db
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: christmas_gifts
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d christmas_gifts"]
+      interval: 3s
+      timeout: 5s
+      retries: 10
+
+
+  migrate:
+    image: golang:1.24-alpine
+    working_dir: /app/backend
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgres://postgres:postgres@db:5432/christmas_gifts?sslmode=disable
+    volumes:
+      - ./backend/scripts/migrate.sh:/app/backend/scripts/migrate.sh
+      - ./backend/migrations:/app/backend/migrations
+    command: >
+      sh -c "
+      apk add --no-cache bash &&
+      chmod +x /app/backend/scripts/migrate.sh &&
+      /app/backend/scripts/migrate.sh
+      "
+
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: dockerfile
+      target: prod
+    environment:
+      DATABASE_URL: postgres://postgres:postgres@db:5432/christmas_gifts?sslmode=disable
+      PORT: "8080"
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - "8080:8080"
+
+ 
+  test-backend:
+    build:
+      context: ./backend
+      dockerfile: dockerfile
+      target: test
+    environment:
+      DATABASE_URL: postgres://postgres:postgres@db:5432/christmas_gifts?sslmode=disable
+      PORT: "8080"
+    depends_on:
+      db:
+        condition: service_healthy
+
+volumes:
+  pgdata:

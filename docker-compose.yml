@@ -44,8 +44,8 @@ services:
       dockerfile: dockerfile
       target: prod
     environment:
-      DATABASE_URL: postgres://postgres:postgres@db:5432/christmas_gifts?sslmode=disable
-      PORT: "8080"
+      - DATABASE_URL=${DATABASE_URL}
+      - PORT=${PORT}
     depends_on:
       db:
         condition: service_healthy
@@ -59,8 +59,8 @@ services:
       dockerfile: dockerfile
       target: test
     environment:
-      DATABASE_URL: postgres://postgres:postgres@db:5432/christmas_gifts?sslmode=disable
-      PORT: "8080"
+      - DATABASE_URL=${DATABASE_URL}
+      - PORT=${PORT}
     depends_on:
       db:
         condition: service_healthy

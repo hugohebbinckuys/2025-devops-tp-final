@@ -43,7 +43,7 @@ services:
     build:
       context: ./backend
       dockerfile: dockerfile
-      target: prod
+      target: dev
     environment:
       - DATABASE_URL=${DATABASE_URL}
       - PORT=${PORT}
@@ -53,22 +53,27 @@ services:
     ports:
       - "8080:8080"
     healthcheck:
-      test: ["CMD", "wget", "--spider", "-q", "http://localhost:8080/health"]
+      test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://127.0.0.1:8080/health || exit 1"]
       interval: 3s
       timeout: 5s
       retries: 10
+      start_period: 10s 
+
 
   
   frontend: 
     build: 
       context: ./frontend
       dockerfile: front.dockerfile
-      target: prod
+      target: dev
+    environment: 
+      VITE_API_URL: http://backend:8080
+      #ajou de cette var d'env pour vite pour pas que essaie de communiquer avec localhost mais bien avec le backend pour le backend 
     depends_on:
       backend: 
         condition: service_healthy
     ports: 
-      - "80:80"
+      - "5173:5173"
 
  
   test-backend:

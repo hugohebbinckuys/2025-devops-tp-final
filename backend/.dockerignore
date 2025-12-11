@@ -1,0 +1,48 @@
+# --- Node ---
+node_modules
+npm-debug.log
+yarn-debug.log
+yarn-error.log
+pnpm-debug.log
+package-lock.json.lock
+.pnpm-store
+
+# --- Vite ---
+dist
+.vite
+.vite-cache
+
+# --- Tests ---
+coverage
+*.spec.ts
+*.test.ts
+.vitest
+
+# --- Env files ---
+.env
+.env.* 
+*.env.local
+.env.production
+.env.development
+
+# --- IDE / OS ---
+.DS_Store
+Thumbs.db
+.idea
+.vscode
+*.swp
+*~
+
+# --- Git ---
+.git
+.gitignore
+
+# --- Docker ---
+Dockerfile
+docker-compose.yml
+
+# --- Misc build outputs ---
+*.log
+logs
+tmp
+.cache

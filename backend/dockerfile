@@ -31,3 +31,11 @@ COPY --from=builder --chown=appuser:appuser /app/main ./main
 USER appuser
 
 CMD ["./main"]
+
+
+FROM golang:1.24-alpine AS dev
+WORKDIR /app
+COPY go.mod go.sum ./
+RUN go mod download
+COPY . .
+CMD ["go", "run", "./cmd/server"]

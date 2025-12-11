@@ -28,7 +28,8 @@ services:
     environment:
       DATABASE_URL: postgres://postgres:postgres@db:5432/christmas_gifts?sslmode=disable
     volumes:
-      - ./backend/scripts/migrate.sh:/app/backend/scripts/migrate.sh
+      # - ./backend/scripts/migrate.sh:/app/backend/scripts/migrate.sh
+      - ./backend/scripts:/app/backend/scripts
       - ./backend/migrations:/app/backend/migrations
     command: >
       sh -c "
@@ -51,6 +52,23 @@ services:
         condition: service_healthy
     ports:
       - "8080:8080"
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:8080/health"]
+      interval: 3s
+      timeout: 5s
+      retries: 10
+
+  
+  frontend: 
+    build: 
+      context: ./frontend
+      dockerfile: front.dockerfile
+      target: prod
+    depends_on:
+      backend: 
+        condition: service_healthy
+    ports: 
+      - "80:80"
 
  
   test-backend:

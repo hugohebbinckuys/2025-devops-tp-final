@@ -8,7 +8,7 @@ We decided to use simple platform that we already used to host our application.
 
 # Dockerisation
 Before that we 'll dockerise our app. 
--> So we are going to create a dockerfile for the backend and the frontend, use a postgres image for our db, and gather all these configurations in a docker compose. 
+-> So we are going to create a dockerfile for the backend and the frontend, use a postgres image for our db, and gather all these configurations in a docker compose for our dev environment. 
 
 
 # CI/CD 

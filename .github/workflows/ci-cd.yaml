@@ -136,7 +136,7 @@ jobs:
       - name: start frontend & backend 
         env: 
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
-          PORT: ${{ secretes.PORT }}
+          PORT: ${{ secrets.PORT }}
         run: docker compose up -d db backend frontend 
         # je crois que detached c important sinon le docker compose est au premier plan et job bloqué 
       - name: install e2E depandances

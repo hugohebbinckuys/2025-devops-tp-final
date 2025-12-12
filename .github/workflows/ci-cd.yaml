@@ -98,7 +98,7 @@ jobs:
   backend-build: 
     needs: [backend-format-tests, frontend-format-tests, backend-unit-tests, frontend-unit-tests]
     if: github.ref == 'refs/heads/main'
-    runs-on: ubuntu
+    runs-on: ubuntu-latest
     steps: 
       - name: checkout code
         uses: actions/checkout@v4

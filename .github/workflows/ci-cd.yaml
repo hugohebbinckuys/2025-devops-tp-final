@@ -6,13 +6,24 @@ on:
   workflow_dispatch: 
 
 jobs: 
+# dev pipeline
   backend-unit-tests: 
     runs-on: ubuntu-latest
     steps: 
       - name: checkout code
         uses: actions/checkout@v4
-      - name: build backend-unit-tests image
-        run: docker build --target test -t "backend-tests-image" -f backend/dockerfile backend/
-      - name: run backend-unit-tests container
-        run: docker run --rm --name "backend-tests-container" backend-tests-image 
+      - name: build backend unit-tests image
+        run: docker build --target test -t "backend-unit-tests-image" -f backend/dockerfile backend/
+      - name: run backend unit-tests container
+        run: docker run --rm --name "backend-unit-tests-container" backend-unit-tests-image 
+  
+  frontend-unit-tests: 
+    runs-on: ubuntu-latest
+    steps: 
+      - name: checkout code
+        uses: actions/checkout@v4
+      - name: build frontend-unit-tests image
+        run: docker build --target test -t "frontend-unit-tests-image" -f frontend/front.dockerfile frontend/
+      - name: run frontend-unit-tests container
+        run: docker run --rm --name "frontend-tests-container" frontend-unit-tests-image 
       

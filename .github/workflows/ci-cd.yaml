@@ -55,7 +55,8 @@ jobs:
       - name: install goland-migrate pour conteneur actuel 
         run: | 
           go install github.com/golang-migrate/migrate/v4/cmd/migrate@latest 
-          export PATH=$PATH:$(go env GOPATH)/bin
+          echo "PATH=$PATH:$(go env GOPATH)/bin" >> $GITHUB_PATH
+        # c pour que le chemin soit persistant sinon trouve pas le chemin jusqu'au binaire migrate
       - name: migrate
         run: ./backend/scripts/migrate.sh
         env: 

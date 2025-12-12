@@ -34,9 +34,9 @@ jobs:
       postgres: 
         image: postgres
         env: 
-          POSTGRES_USER: postgres
-          POSTGRES_PASSWORD: postgres
-          POSTGRES_DB: christmas_gifts
+          POSTGRES_USER: ${{ secrets.DB_USER }}
+          POSTGRES_PASSWORD: ${{ secrets.DB_PASSWORD }}
+          POSTGRES_DB: ${{ secrets.DB_NAME }}
         options: >-
           --health-cmd pg_isready
           --health-interval 10s
@@ -53,7 +53,7 @@ jobs:
       - name: migrate
         run: ./scripts/migrate.sh
         env: 
-          POSTGRES_USER: postgres
-          POSTGRES_PASSWORD: postgres
-          POSTGRES_DB: db
-          POSTGRES_PORT: 5432
+          POSTGRES_USER: ${{ secrets.DB_USER }}
+          POSTGRES_PASSWORD: ${{ secrets.DB_PASSWORD }}
+          POSTGRES_DB: ${{ secrets.DB_NAME }}
+          POSTGRES_PORT: ${{ secrets.DB_PORT }}

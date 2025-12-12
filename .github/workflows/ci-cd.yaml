@@ -56,9 +56,12 @@ jobs:
         run: | 
           go install github.com/golang-migrate/migrate/v4/cmd/migrate@latest 
           echo "PATH=$PATH:$(go env GOPATH)/bin" >> $GITHUB_PATH
-        # c pour que le chemin soit persistant sinon trouve pas le chemin jusqu'au binaire migrate
+        # c pour que le chemin soit persistant entre les steps sinon nouveau step = nouveau shelle et trouve pas le chemin jusqu'au binaire migrate
       - name: migrate
-        run: ./backend/scripts/migrate.sh
+        run: | 
+          cd backend
+          ./scripts/migrate.sh
+        # on va dans backend avant de lancer le script prcq dans le script y a un chemin relatif qui part de backend 
         env: 
           POSTGRES_USER: ${{ secrets.DB_USER }}
           POSTGRES_PASSWORD: ${{ secrets.DB_PASSWORD }}

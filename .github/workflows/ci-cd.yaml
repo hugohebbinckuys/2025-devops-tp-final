@@ -134,6 +134,9 @@ jobs:
       - name: checkout code
         uses: actions/checkout@v4 
       - name: start frontend & backend 
+        env: 
+          DATABASE_URL: ${{ DATABASE_URL }}
+          PORT: ${{ PORT }}
         run: docker compose up -d db backend frontend 
         # je crois que detached c important sinon le docker compose est au premier plan et job bloqué 
       - name: install e2E depandances

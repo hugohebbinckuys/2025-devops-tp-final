@@ -51,7 +51,7 @@ jobs:
       # - name: run backend container
       #   run: docker run --rm --name "backend-container-for-migration" -e DATABASE_URL=${{ secrets.DATABASE_URL }} backend-image-for-migration
       - name: run docker compose to be able to migrate
-        run: docker compose --rm backend migrate
+        run: docker compose up --build backend migrate
       - name: migrate
         run: ./scripts/migrate.sh
         env: 

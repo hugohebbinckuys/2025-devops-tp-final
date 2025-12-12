@@ -45,7 +45,7 @@ jobs:
         # pr etre sur que postgres est bien start
     steps: 
       - name: checkout code 
-        uses: actions.checkout@v4
+        uses: actions/checkout@v4
       - name: build backend image 
         run: docker build --target dev -t "backend-image-for-migration" -f backend/dockerfile /backend
       - name: run backend container
@@ -57,4 +57,3 @@ jobs:
           POSTGRES_PASSWORD: postgres
           POSTGRES_DB: db
           POSTGRES_PORT: 5432
-    

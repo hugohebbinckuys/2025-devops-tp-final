@@ -52,6 +52,8 @@ jobs:
       #   run: docker run --rm --name "backend-container-for-migration" -e DATABASE_URL=${{ secrets.DATABASE_URL }} backend-image-for-migration
       - name: run docker compose to be able to migrate
         run: docker compose up --build backend migrate
+      - name: install goland-migrate pour conteneur actuel 
+        run: go install github.com/golang-migrate/migrate/v4/cmd/migrate@latest && export PATH=$PATH:$(go env GOPATH)/bin
       - name: migrate
         run: ./backend/scripts/migrate.sh
         env: 

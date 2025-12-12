@@ -2,7 +2,7 @@ name: final-devops-tp
 
 on: 
   push: 
-  pull-request: 
+  pull_request: 
   workflow_dispatch: 
 
 jobs: 

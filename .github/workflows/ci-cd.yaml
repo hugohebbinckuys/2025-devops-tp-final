@@ -105,7 +105,7 @@ jobs:
       - name: build backend prod image
         run: docker build --target prod -t "backend-prod-image" -f backend/dockerfile backend/
 
-  fonrtend-build: 
+  frontend-build: 
     needs: [backend-unit-tests, frontend-unit-tests]
     if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest 

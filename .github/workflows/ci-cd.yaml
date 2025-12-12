@@ -53,7 +53,7 @@ jobs:
       - name: run docker compose to be able to migrate
         run: docker compose up --build backend migrate
       - name: migrate
-        run: ./scripts/migrate.sh
+        run: ./backend/scripts/migrate.sh
         env: 
           POSTGRES_USER: ${{ secrets.DB_USER }}
           POSTGRES_PASSWORD: ${{ secrets.DB_PASSWORD }}

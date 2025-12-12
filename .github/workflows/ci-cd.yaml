@@ -49,7 +49,7 @@ jobs:
       - name: build backend image 
         run: docker build --target dev -t "backend-image-for-migration" -f backend/dockerfile backend/
       - name: run backend container
-        run: docker run --rm --name "backend-container-for-migration" backend-image-for-migration
+        run: docker run --rm --name "backend-container-for-migration" -e DATABASE_URL=${{ secrets.DATABASE_URL }} backend-image-for-migration
       - name: migrate
         run: ./scripts/migrate.sh
         env: 

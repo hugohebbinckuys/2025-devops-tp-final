@@ -130,21 +130,21 @@ jobs:
           --health-interval 10s 
           --health-timeout 5s 
           --health-retries 5 
-      steps: 
-        - name: checkout code
-          uses: actions/checkout@v4 
-        - name: start frontend & backend 
-          run: docker compose up -d db backend frontend 
-          # je crois que detached c important sinon le docker compose est au premier plan et job bloqué 
-        - name: install e2E depandances
-          run: | 
-            cd e2e
-            npm ci 
-        - name: install playwright browser
-          run: | 
-            cd e2e 
-            npx playwright install --with-deps 
-        - name: run e2e
-          run: | 
-            cd e2e 
-            npm test 
+    steps: 
+      - name: checkout code
+        uses: actions/checkout@v4 
+      - name: start frontend & backend 
+        run: docker compose up -d db backend frontend 
+        # je crois que detached c important sinon le docker compose est au premier plan et job bloqué 
+      - name: install e2E depandances
+        run: | 
+          cd e2e
+          npm ci 
+      - name: install playwright browser
+        run: | 
+          cd e2e 
+          npx playwright install --with-deps 
+      - name: run e2e
+        run: | 
+          cd e2e 
+          npm test 

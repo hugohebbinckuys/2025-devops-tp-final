@@ -52,9 +52,9 @@ jobs:
       #   run: docker run --rm --name "backend-container-for-migration" -e DATABASE_URL=${{ secrets.DATABASE_URL }} backend-image-for-migration
       - name: run docker compose to be able to migrate
         run: docker compose up --build backend migrate
-      - name: install goland-migrate pour conteneur actuel 
+      - name: install goland-migrate pour conteneur actuel avec Postgres driver
         run: | 
-          go install github.com/golang-migrate/migrate/v4/cmd/migrate@latest 
+          go install -tags 'postgres' github.com/golang-migrate/migrate/v4/cmd/migrate@latest 
           echo "PATH=$PATH:$(go env GOPATH)/bin" >> $GITHUB_PATH
         # c pour que le chemin soit persistant entre les steps sinon nouveau step = nouveau shelle et trouve pas le chemin jusqu'au binaire migrate
       - name: migrate

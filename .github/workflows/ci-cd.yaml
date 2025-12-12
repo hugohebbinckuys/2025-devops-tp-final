@@ -12,7 +12,7 @@ jobs:
       - name: checkout code
         uses: actions/checkout@v4
       - name: build backend-unit-tests image
-        run: docker build --target test -t "backend-tests-image" -f backend/dockerfile /backend 
+        run: docker build --target test -t "backend-tests-image" -f backend/dockerfile backend/
       - name: run backend-unit-tests container
         run: docker run --rm --name "backend-tests-container" backend-tests-image 
       

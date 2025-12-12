@@ -47,7 +47,7 @@ jobs:
       - name: checkout code 
         uses: actions/checkout@v4
       - name: build backend image 
-        run: docker build --target dev -t "backend-image-for-migration" -f backend/dockerfile /backend
+        run: docker build --target dev -t "backend-image-for-migration" -f backend/dockerfile backend/
       - name: run backend container
         run: docker run --rm --name "backend-container-for-migration" backend-image-for-migration
       - name: migrate

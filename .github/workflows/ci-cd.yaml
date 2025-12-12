@@ -94,3 +94,23 @@ jobs:
           POSTGRES_PASSWORD: ${{ secrets.DB_PASSWORD }}
           POSTGRES_DB: ${{ secrets.DB_NAME }}
           POSTGRES_PORT: ${{ secrets.DB_PORT }}
+
+  backend-build: 
+    needs: [backend-format-tests, frontend-format-tests, backend-unit-tests, frontend-unit-tests]
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu
+    steps: 
+      - name: checkout code
+        uses: actions/checkout@v4
+      - name: build backend prod image
+        run: docker build --target prod -t "backend-prod-image" -f backend/dockerfile backend/
+
+  fonrtend-build: 
+    needs: [backend-unit-tests, frontend-unit-tests]
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest 
+    steps: 
+      - name: checkout coed
+        uses: actions/checkout@v4 
+      - name: build frontend prod image 
+        run: docker build --target prod -t "frontend-prod-image" -f frontend/front.dockerfile frontend/

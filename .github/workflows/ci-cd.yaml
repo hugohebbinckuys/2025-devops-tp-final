@@ -1,0 +1,116 @@
+name: final-devops-tp
+
+on: 
+  push: 
+  pull_request: 
+  workflow_dispatch: 
+
+jobs: 
+# dev pipeline
+  backend-format-tests: 
+    runs-on: ubuntu-latest
+    steps: 
+      - name: checkout code
+        uses: actions/checkout@v4
+      - name: format tests 
+        run: | 
+          cd backend
+          go vet ./...
+          go fmt ./...
+  
+  frontend-format-tests: 
+    runs-on: ubuntu-latest
+    steps: 
+      - name: checkout code
+        uses: actions/checkout@v4
+      - name: install dependances
+        run: | 
+          cd frontend
+          npm ci 
+        # comme npm install mais opti pr CI je crois (only package-lock.json)
+      - name: lancer format checks 
+        run: | 
+          cd frontend
+          npm run lint 
+          npm run format
+
+  backend-unit-tests: 
+    runs-on: ubuntu-latest
+    steps: 
+      - name: checkout code
+        uses: actions/checkout@v4
+      - name: build backend unit-tests image
+        run: docker build --target test -t "backend-unit-tests-image" -f backend/dockerfile backend/
+      - name: run backend unit-tests container
+        run: docker run --rm --name "backend-unit-tests-container" backend-unit-tests-image 
+  
+  frontend-unit-tests: 
+    runs-on: ubuntu-latest
+    steps: 
+      - name: checkout code
+        uses: actions/checkout@v4
+      - name: build frontend unit-tests image
+        run: docker build --target test -t "frontend-unit-tests-image" -f frontend/front.dockerfile frontend/
+      - name: run frontend unit-tests container
+        run: docker run --rm --name "frontend-tests-container" frontend-unit-tests-image 
+      
+  db-migration: 
+    runs-on: ubuntu-latest
+    # container: golang:1.24-alpine
+    services: 
+      postgres: 
+        image: postgres
+        env: 
+          POSTGRES_USER: ${{ secrets.DB_USER }}
+          POSTGRES_PASSWORD: ${{ secrets.DB_PASSWORD }}
+          POSTGRES_DB: ${{ secrets.DB_NAME }}
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        # pr etre sur que postgres est bien start
+    steps: 
+      - name: checkout code 
+        uses: actions/checkout@v4
+      # - name: build backend image 
+      #   run: docker build --target dev -t "backend-image-for-migration" -f backend/dockerfile backend/
+      # - name: run backend container
+      #   run: docker run --rm --name "backend-container-for-migration" -e DATABASE_URL=${{ secrets.DATABASE_URL }} backend-image-for-migration
+      - name: run docker compose to be able to migrate
+        run: docker compose up --build backend migrate
+      - name: install goland-migrate pour conteneur actuel avec Postgres driver
+        run: | 
+          go install -tags 'postgres' github.com/golang-migrate/migrate/v4/cmd/migrate@latest 
+          echo "PATH=$PATH:$(go env GOPATH)/bin" >> $GITHUB_PATH
+        # c pour que le chemin soit persistant entre les steps sinon nouveau step = nouveau shelle et trouve pas le chemin jusqu'au binaire migrate
+      - name: migrate
+        run: | 
+          cd backend
+          ./scripts/migrate.sh
+        # on va dans backend avant de lancer le script prcq dans le script y a un chemin relatif qui part de backend 
+        env: 
+          POSTGRES_USER: ${{ secrets.DB_USER }}
+          POSTGRES_PASSWORD: ${{ secrets.DB_PASSWORD }}
+          POSTGRES_DB: ${{ secrets.DB_NAME }}
+          POSTGRES_PORT: ${{ secrets.DB_PORT }}
+
+  backend-build: 
+    needs: [backend-format-tests, frontend-format-tests, backend-unit-tests, frontend-unit-tests]
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu
+    steps: 
+      - name: checkout code
+        uses: actions/checkout@v4
+      - name: build backend prod image
+        run: docker build --target prod -t "backend-prod-image" -f backend/dockerfile backend/
+
+  frontend-build: 
+    needs: [backend-unit-tests, frontend-unit-tests]
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest 
+    steps: 
+      - name: checkout coed
+        uses: actions/checkout@v4 
+      - name: build frontend prod image 
+        run: docker build --target prod -t "frontend-prod-image" -f frontend/front.dockerfile frontend/

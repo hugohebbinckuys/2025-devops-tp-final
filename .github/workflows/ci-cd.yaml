@@ -154,6 +154,8 @@ jobs:
 
   images-on-dockerhub: 
     needs: [e2e]
+    if: startsWith(github.refs, 'refs/tags/')
+    # deploy (dockerhub, render, netlify) que qd on push un tag 
     runs-on: ubuntu-latest
     steps: 
       - name: checkout code
@@ -175,6 +177,7 @@ jobs:
 
   deploy-backend-on-render: 
     needs: [images-on-dockerhub]
+    if: startsWith(github.refs, 'refs/tags/')
     runs-on: ubuntu-latest
     steps: 
       - name: deploy to render
@@ -187,6 +190,7 @@ jobs:
 
   deploy-frontend-on-netlify: 
     needs: [images-on-dockerhub]
+    if: startsWith(github.refs, 'refs/tags/')
     runs-on: ubuntu-latest
     steps: 
       - name: checkout code
@@ -198,4 +202,5 @@ jobs:
           NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
           NETLIFY_DEPLOY_MESSAGE: "Prod deploy v${{ github.ref }}"
           NETLIFY_DEPLOY_TO_PROD: true
+        working-directory: frontend
   

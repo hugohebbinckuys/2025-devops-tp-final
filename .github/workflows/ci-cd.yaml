@@ -178,7 +178,7 @@ jobs:
     runs-on: ubuntu-latest
     steps: 
       - name: deploy to render
-        uses: gh-actions-workflow/deploy-docker-render@v1.1
+        uses: gh-actions-workflows/deploy-docker-render@v1.1
         with: 
           deploy-hook: ${{ secrets.RENDER_DEPLOY_HOOK }}
           image-url: hugohebbinckuys/devops-final-tp-backend:main

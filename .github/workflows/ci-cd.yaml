@@ -203,25 +203,25 @@ jobs:
   #         NETLIFY_DEPLOY_MESSAGE: "Prod deploy v${{ github.ref }}"
   #         NETLIFY_DEPLOY_TO_PROD: true
   
-    deploy-frontend-on-netlify: 
-      needs: [images-on-dockerhub]
-      if: startsWith(github.refs, 'refs/tags/')
-      runs-on: ubuntu-latest
-      steps: 
-        - name: checkout code 
-          uses: actions/checkout@v4
-        - name: install npm 
-          uses: actions/setup-node@v3
-          with: 
-            node-version: '20'
-        - name: install deps and builmd
-          run: | 
-            cd frontend 
-            npm ci 
-            npm run build 
-        - name: deploy frontend on netlify 
-          run: |
-            cd frontend 
-            npx netlify deploy --prod --dir=./build --site=$NETLIFY_SITE_ID
-          env: 
-            NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
+  deploy-frontend-on-netlify: 
+    needs: [images-on-dockerhub]
+    if: startsWith(github.refs, 'refs/tags/')
+    runs-on: ubuntu-latest
+    steps: 
+      - name: checkout code 
+        uses: actions/checkout@v4
+      - name: install npm 
+        uses: actions/setup-node@v3
+        with: 
+          node-version: '20'
+      - name: install deps and builmd
+        run: | 
+          cd frontend 
+          npm ci 
+          npm run build 
+      - name: deploy frontend on netlify 
+        run: |
+          cd frontend 
+          npx netlify deploy --prod --dir=./build --site=$NETLIFY_SITE_ID
+        env: 
+          NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}

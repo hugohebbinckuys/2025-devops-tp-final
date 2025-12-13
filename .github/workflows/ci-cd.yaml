@@ -106,7 +106,7 @@ jobs:
         run: docker build --target prod -t "backend-prod-image" -f backend/dockerfile backend/
 
   frontend-build: 
-    needs: [backend-unit-tests, frontend-unit-tests]
+    needs: [backend-unit-tests, frontend-unit-tests, backend-unit-tests, frontend-unit-tests]
     if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest 
     steps: 
@@ -172,3 +172,15 @@ jobs:
         run: docker build --target prod -t "hugohebbinckuys/devops-final-tp-frontend:main" -f frontend/front.dockerfile frontend/
       - name: push frontend to dockerhub 
         run: docker push hugohebbinckuys/devops-final-tp-frontend:main
+
+  deploy-backend-on-render: 
+    needs: [images-on-dockerhub]
+    runs-on: ubuntu-latest
+    steps: 
+      - name: deploy to render
+        uses: gh-actions-workflow/deploy-docker-render@v1.1
+        with: 
+          deploy-hook: ${{ secrets.RENDER_DEPLOY_HOOK }}
+          image-url: hugohebbinckuys/devops-final-tp-backend:main
+          render-api-key: ${{ secrets.RENDER_API_KEY}}
+          wait-for-deployment: true

@@ -151,3 +151,24 @@ jobs:
         run: | 
           cd e2e 
           npm test 
+
+  images-on-dockerhub: 
+    needs: [e2e]
+    runs-on: ubuntu-latest
+    steps: 
+      - name: checkout code
+        uses: actions/checkout@v4
+      - name: connect to dockerhub
+        uses: docker/login-action@v3
+        with: 
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - name: build backend image 
+        run: | 
+          docker build --target prod -t "hugohebbinckuys/devops-final-tp-backend:main" -f backend/dockerfile backend/
+      - name: push backend to dockerhub 
+        run: docker push hugohebbinckuys/devops-final-tp-backend:main
+      - name: build frontend image 
+        run: docker build --target prod -t "hugohebbinckuys/devops-final-tp-frontend:main" -f frontend/front.dockerfile frontend/
+      - name: push frontend to dockerhub 
+        run: docker push hugohebbinckuys/devops-final-tp-frontend:main

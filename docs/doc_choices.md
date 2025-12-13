@@ -30,16 +30,12 @@ Once the merge is ok on branch main, someone in the team 'll "validate" the main
 The tag push 'll trigger the prod CI/CD with install, tests, builds, github release, deployment of the app's diferent parts on their host platform (backend -> Render, front -> Netlify etc.), deploy also the storybook, update of the db, docker images 'll be pushed on dockerhub... 
 
 
-# Reverse-proxy  
-We 'll use 3 reverse-proxies linked to each context. 
+### Reverse-proxy
+We use 2 reverse-proxies depending on the context to route /api/* requests from frontend to backend.
 
-## Prod proxy 
-For our prod app, as we host our frontend on netlify, it'll be netlify that 'll play the proxy role. 
-We'll create a netlify.toml file to configure this proxy. 
+Dev proxy (Vite)
+In local dev and Docker dev mode, Vite's built-in proxy (configured in vite.config.ts) forwards /api/* to http://localhost:8080 or http://backend:8080.
 
-## Dev proxy 
-This one 'll be for our dev server in local. 
-As we use Vite with react, we'll add a proxy-conf part in the vite.config.ts file to put in place this proxy on dev. 
+Prod proxy (Netlify)
+In production, Netlify handles the proxy via netlify.toml, rewriting /api/* to the backend's public URL on Render.
 
-# Docker compose proxy 
-This one 'll be useful for organize trafic between our containers. As Docker isolate the services, they are'nt available outside the docker network so we need something to route requests into the good container without expose every port manually. 

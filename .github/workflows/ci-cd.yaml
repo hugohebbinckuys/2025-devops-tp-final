@@ -56,7 +56,6 @@ jobs:
       
   db-migration: 
     runs-on: ubuntu-latest
-    # container: golang:1.24-alpine
     services: 
       postgres: 
         image: postgres
@@ -95,9 +94,11 @@ jobs:
           POSTGRES_DB: ${{ secrets.DB_NAME }}
           POSTGRES_PORT: ${{ secrets.DB_PORT }}
 
+# main pipeline
+
   backend-build: 
-    needs: [backend-format-tests, frontend-format-tests, backend-unit-tests, frontend-unit-tests]
-    if: github.ref == 'refs/heads/main'
+    needs: [backend-format-tests, frontend-format-tests, backend-unit-tests, frontend-unit-tests, db-migration]
+    if: github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/')
     runs-on: ubuntu-latest
     steps: 
       - name: checkout code
@@ -106,8 +107,8 @@ jobs:
         run: docker build --target prod -t "backend-prod-image" -f backend/dockerfile backend/
 
   frontend-build: 
-    needs: [backend-unit-tests, frontend-unit-tests, backend-unit-tests, frontend-unit-tests]
-    if: github.ref == 'refs/heads/main'
+    needs: [backend-unit-tests, frontend-unit-tests, backend-unit-tests, frontend-unit-tests, db-migration]
+    if: github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/')
     runs-on: ubuntu-latest 
     steps: 
       - name: checkout coed
@@ -117,6 +118,7 @@ jobs:
 
   e2e: 
     needs: [backend-build, frontend-build]
+    if: github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/')
     runs-on: ubuntu-latest
     services: 
       postgres: 
@@ -152,9 +154,11 @@ jobs:
           cd e2e 
           npm test 
 
+# deployment pipeline
+
   images-on-dockerhub: 
     needs: [e2e]
-    if: startsWith(github.refs, 'refs/tags/')
+    if: startsWith(github.ref, 'refs/tags/')
     # deploy (dockerhub, render, netlify) que qd on push un tag 
     runs-on: ubuntu-latest
     steps: 
@@ -177,7 +181,8 @@ jobs:
 
   deploy-backend-on-render: 
     needs: [images-on-dockerhub]
-    if: startsWith(github.refs, 'refs/tags/')
+    if: startsWith(github.ref, 'refs/tags/')
+
     runs-on: ubuntu-latest
     steps: 
       - name: deploy to render
@@ -205,7 +210,7 @@ jobs:
   
   deploy-frontend-on-netlify: 
     needs: [images-on-dockerhub]
-    if: startsWith(github.refs, 'refs/tags/')
+    if: startsWith(github.ref, 'refs/tags/')
     runs-on: ubuntu-latest
     steps: 
       - name: checkout code 

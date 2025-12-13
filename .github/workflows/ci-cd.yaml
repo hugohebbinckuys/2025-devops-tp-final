@@ -107,7 +107,7 @@ jobs:
         run: docker build --target prod -t "backend-prod-image" -f backend/dockerfile backend/
 
   frontend-build: 
-    needs: [backend-unit-tests, frontend-unit-tests, backend-unit-tests, frontend-unit-tests, db-migration]
+    needs: [backend-unit-tests, frontend-unit-tests, db-migration]
     if: github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/')
     runs-on: ubuntu-latest 
     steps: 
@@ -225,7 +225,9 @@ jobs:
           npm ci 
           npm run build 
       - name: deploy frontend on netlify 
-        run: npx netlify deploy --dir=frontend/build --prod --site=$NETLIFY_SITE_ID
+        run: |
+          cd frontend
+          npx netlify deploy --dir=./build --prod --site=${{ secrets.NETLIFY_SITE_ID }}
         env: 
           NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
 
@@ -241,7 +243,9 @@ jobs:
           go install -tags 'postgres' github.com/golang-migrate/migrate/v4/cmd/migrate@latest
           echo "PATH=$PATH:$(go env GOPATH)/bin" >> $GITHUB_PATH
       - name: Run migrations
-        run: ./backend/scripts/migrate.sh
+        run: | 
+          cd backend
+          ./scripts/migrate.sh
         env: 
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
 
@@ -266,6 +270,7 @@ jobs:
           npm run build-storybook
       - name: Deploy Storybook on Netlify
         run: |
-          npx netlify deploy --dir=frontend/storybook-static --prod --site=$NETLIFY_STORYBOOK_SITE_ID
+          cd frontend 
+          npx netlify deploy --dir=./storybook-static --prod --site=${{ secrets.NETLIFY_STORYBOOK_SITE_ID }}
         env:
           NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}

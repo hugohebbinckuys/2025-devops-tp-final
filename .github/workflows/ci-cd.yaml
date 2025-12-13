@@ -184,3 +184,18 @@ jobs:
           image-url: hugohebbinckuys/devops-final-tp-backend:main
           render-api-key: ${{ secrets.RENDER_API_KEY}}
           wait-for-deployment: true
+
+  deploy-frontend-on-netlify: 
+    needs: [images-on-dockerhub]
+    runs-on: ubuntu-latest
+    steps: 
+      - name: checkout code
+        uses: actions/checkout@v4
+      - name: deploy on netlify 
+        uses: jsmrcaga/action-netlify-deploy@master
+        with: 
+          NETLIFY_AUTH_TOKEN: ${{ NETLIFY_AUTH_TOKEN }}
+          NETLIFY_SITE_ID: ${{ NETLIFY_SITE_ID }}
+          NETLIFY_DEPLOY_MESSAGE: "Prod deploy v${{ github.ref }}"
+          NETLIFY_DEPLOY_TO_PROD: true
+  
